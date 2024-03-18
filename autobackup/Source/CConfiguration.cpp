@@ -1,4 +1,4 @@
-#include "CConfiguration.h"
+#include "../Include/CConfiguration.h"
 
 CConfiguration::CConfiguration()
 	: m_iRotationDayOfWeek(0),

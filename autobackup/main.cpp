@@ -1,4 +1,6 @@
-﻿#include "autobackup.h"
+﻿#include <ctime>
+
+#include "Include/CConfiguration.h"
 
 std::string IntToString(int iValue)
 {
@@ -43,14 +45,14 @@ int main(int argc, char* argv[])
 
 				std::string m_sDirectory = rDatabaseConfig->m_sBackupDirectory + "/daily/";
 				std::string m_sCommand = "mkdir -p " + m_sDirectory;
-				
+
 				system(m_sCommand.c_str());
 
 				m_sCommand = "docker exec " + rDatabaseConfig->m_sContainerName + " mysqldump -u " + rDatabaseConfig->m_sUsername + " -p" + rDatabaseConfig->m_sPassword + " --all-databases > "
 					+ m_sDirectory + rDatabaseConfig->m_sDatabaseName + "_" + IntToString(iYear) + "-" + IntToString(iMonth) + "-" + IntToString(iDay) + "_" + IntToString(iHours) + "-" + IntToString(iMinutes) + "-" + IntToString(iSeconds) + ".sql";
-				
+
 				system(m_sCommand.c_str());
-			}	
+			}
 		}
 	}
 
