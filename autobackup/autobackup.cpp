@@ -1,5 +1,15 @@
 ﻿#include "autobackup.h"
 
+std::string IntToString(int iValue)
+{
+	std::string sResult;
+	if (iValue < 10)
+	{
+		sResult += "0";
+	}
+	return sResult + std::to_string(iValue);
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 2)
@@ -15,27 +25,32 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cout << "Rotation Day Of Week: " << cConfig.GetRotationDayOfWeek() << std::endl;
-		std::cout << "Daily: " << cConfig.GetCountDaily() << std::endl;
-		std::cout << "Weekly: " << cConfig.GetCountWeekly() << std::endl;
-		std::cout << "Monthly: " << cConfig.GetCountMonthly() << std::endl;
-		std::cout << std::endl;
-
-		for (auto& rDbConfig : cConfig.GetDatabases())
+		for (auto& rDatabaseConfig : cConfig.GetDatabases())
 		{
-			std::cout << "Username: " << rDbConfig->m_sUsername << std::endl;
-			std::cout << "Password: " << rDbConfig->m_sPassword << std::endl;
-			std::cout << "Host: " << rDbConfig->m_sHost << std::endl;
-			std::cout << "Port: " << rDbConfig->m_iPort << std::endl;
-			std::cout << "Backup Directory: " << rDbConfig->m_sBackupDirectory << std::endl;
-			std::cout << "Database Name: " << rDbConfig->m_sDatabaseName << std::endl;
-			std::cout << "Database Provider: ";
-			if (rDbConfig->m_eDatabaseProvider == EDatabaseProvider::Mysql)
-				std::cout << "MySQL";
-			else if (rDbConfig->m_eDatabaseProvider == EDatabaseProvider::MSSQL)
-				std::cout << "MSSQL";
-			std::cout << std::endl;
-			std::cout << std::endl;
+			if (rDatabaseConfig->m_eDatabaseProvider == EDatabaseProvider::Mysql)
+			{
+				std::cout << "Backuping " << rDatabaseConfig->m_sDatabaseName << "..." << std::endl;
+
+				std::time_t iCurrentTime = std::time(nullptr);
+				std::tm* pLocalTime = std::localtime(&iCurrentTime);
+
+				int iYear = pLocalTime->tm_year + 1900;
+				int iMonth = pLocalTime->tm_mon + 1;
+				int iDay = pLocalTime->tm_mday;
+				int iHours = pLocalTime->tm_hour;
+				int iMinutes = pLocalTime->tm_min;
+				int iSeconds = pLocalTime->tm_sec;
+
+				std::string m_sDirectory = rDatabaseConfig->m_sBackupDirectory + "/daily/";
+				std::string m_sCommand = "mkdir -p " + m_sDirectory;
+				
+				system(m_sCommand.c_str());
+
+				m_sCommand = "docker exec " + rDatabaseConfig->m_sContainerName + " mysqldump -u " + rDatabaseConfig->m_sUsername + " -p" + rDatabaseConfig->m_sPassword + " --all-databases > "
+					+ m_sDirectory + rDatabaseConfig->m_sDatabaseName + "_" + IntToString(iYear) + "-" + IntToString(iMonth) + "-" + IntToString(iDay) + "_" + IntToString(iHours) + "-" + IntToString(iMinutes) + "-" + IntToString(iSeconds) + ".sql";
+				
+				system(m_sCommand.c_str());
+			}	
 		}
 	}
 

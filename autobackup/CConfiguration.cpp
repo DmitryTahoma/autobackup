@@ -124,7 +124,7 @@ bool CConfiguration::Load(const char* _sPath)
 			}
 			else if (sDbParam == "CONTAINER_ID")
 			{
-				rDbInfo->m_sBackupDirectory = sValue;
+				rDbInfo->m_sContainerName = sValue;
 			}
 			else if (sDbParam == "BACKUP_DIR")
 			{
