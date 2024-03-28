@@ -1,16 +1,5 @@
-﻿#include <ctime>
-
-#include "Include/CConfiguration.h"
-
-std::string IntToString(int iValue)
-{
-	std::string sResult;
-	if (iValue < 10)
-	{
-		sResult += "0";
-	}
-	return sResult + std::to_string(iValue);
-}
+﻿#include "Include/CConfiguration.h"
+#include "Include/MySQLDumper.h"
 
 int main(int argc, char* argv[])
 {
@@ -31,27 +20,8 @@ int main(int argc, char* argv[])
 		{
 			if (rDatabaseConfig->m_eDatabaseProvider == EDatabaseProvider::Mysql)
 			{
-				std::cout << "Backuping " << rDatabaseConfig->m_sDatabaseName << "..." << std::endl;
-
-				std::time_t iCurrentTime = std::time(nullptr);
-				std::tm* pLocalTime = std::localtime(&iCurrentTime);
-
-				int iYear = pLocalTime->tm_year + 1900;
-				int iMonth = pLocalTime->tm_mon + 1;
-				int iDay = pLocalTime->tm_mday;
-				int iHours = pLocalTime->tm_hour;
-				int iMinutes = pLocalTime->tm_min;
-				int iSeconds = pLocalTime->tm_sec;
-
-				std::string m_sDirectory = rDatabaseConfig->m_sBackupDirectory + "/daily/";
-				std::string m_sCommand = "mkdir -p " + m_sDirectory;
-
-				system(m_sCommand.c_str());
-
-				m_sCommand = "docker exec " + rDatabaseConfig->m_sContainerName + " mysqldump -u " + rDatabaseConfig->m_sUsername + " -p" + rDatabaseConfig->m_sPassword + " --all-databases > "
-					+ m_sDirectory + rDatabaseConfig->m_sDatabaseName + "_" + IntToString(iYear) + "-" + IntToString(iMonth) + "-" + IntToString(iDay) + "_" + IntToString(iHours) + "-" + IntToString(iMinutes) + "-" + IntToString(iSeconds) + ".sql";
-
-				system(m_sCommand.c_str());
+				MySQLDumper dumper(rDatabaseConfig);
+				dumper.Dump();
 			}
 		}
 	}

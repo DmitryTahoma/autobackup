@@ -3,7 +3,18 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-# Add source to this project's executable.
-add_executable (autobackup "main.cpp"  "Include/SDatabaseConfig.h" "Include/EDatabaseProvider.h" "Include/CConfiguration.h" "Source/CConfiguration.cpp")
+set(HEADER_FILES
+    "Include/CConfiguration.h"
+    "Include/DumperBase.h"
+    "Include/EDatabaseProvider.h"
+    "Include/MySQLDumper.h"
+    "Include/SDatabaseConfig.h"
+)
 
-# TODO: Add tests and install targets if needed.
+set(SOURCE_FILES
+    "Source/CConfiguration.cpp"
+    "Source/DumperBase.cpp"
+    "Source/MySQLDumper.cpp"
+)
+
+add_executable (autobackup "main.cpp" ${HEADER_FILES} ${SOURCE_FILES})
