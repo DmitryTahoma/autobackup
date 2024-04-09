@@ -9,6 +9,7 @@ set(HEADER_FILES
     "Include/EDatabaseProvider.h"
     "Include/MySQLDumper.h"
     "Include/SDatabaseConfig.h"
+    "Include/MyLZMA.h"
 )
 
 set(SOURCE_FILES
@@ -17,4 +18,7 @@ set(SOURCE_FILES
     "Source/MySQLDumper.cpp"
 )
 
+find_package(LibLZMA REQUIRED)
 add_executable (autobackup "main.cpp" ${HEADER_FILES} ${SOURCE_FILES})
+target_link_libraries(autobackup LibLZMA::LibLZMA)
+# target_include_directories(autobackup PRIVATE ${LibLZMA_INCLUDE_DIRS})

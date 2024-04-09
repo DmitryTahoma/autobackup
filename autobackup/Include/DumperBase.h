@@ -11,8 +11,10 @@ public:
     virtual void Dump() = 0;
     
     std::string GetCurrentDateString();
+    std::string GetDumpFileName();
 
 protected:
     std::shared_ptr<SDatabaseConfig> pConfig;
+    std::string sDumpFileName;
 
 };

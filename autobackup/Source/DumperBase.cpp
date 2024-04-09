@@ -22,3 +22,8 @@ std::string DumperBase::GetCurrentDateString()
     sprintf(sBuf, "%i-%02i-%02i_%02i-%02i-%02i", iYear, iMonth, iDay, iHours, iMinutes, iSeconds);
     return std::string(sBuf);
 }
+
+std::string DumperBase::GetDumpFileName()
+{
+	return sDumpFileName;
+}

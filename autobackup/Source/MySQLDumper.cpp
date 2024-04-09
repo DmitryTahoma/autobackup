@@ -15,6 +15,10 @@ void MySQLDumper::Dump()
     MakeDirectory(sDailyDir);
 
     std::stringstream ss;
+    ss << sDailyDir << pConfig->m_sDatabaseName << "_" << GetCurrentDateString() << ".sql";
+    sDumpFileName = ss.str();
+
+    ss.str("");
     ss << "docker exec "
         << pConfig->m_sContainerName
         << " mysqldump"
@@ -25,7 +29,7 @@ void MySQLDumper::Dump()
         << " -d " << pConfig->m_sDatabaseName
         << " --no-data=false"
         << " --routines"
-        << " > " << sDailyDir << pConfig->m_sDatabaseName << "_" << GetCurrentDateString() << ".sql";
+        << " > " << sDumpFileName;
     
     system(ss.str().c_str());
 
