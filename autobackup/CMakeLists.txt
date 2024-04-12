@@ -10,6 +10,7 @@ set(HEADER_FILES
     "Include/CMySQLDumper.h"
     "Include/SDatabaseConfig.h"
     "Include/CLZMAUtil.h"
+    "Include/CTimeSpan.h"
 )
 
 set(SOURCE_FILES
@@ -17,6 +18,7 @@ set(SOURCE_FILES
     "Source/CDumperBase.cpp"
     "Source/CMySQLDumper.cpp"
     "Source/CLZMAUtil.cpp"
+    "Source/CTimeSpan.cpp"
 )
 
 find_package(LibLZMA REQUIRED)
