@@ -46,7 +46,7 @@ bool CLZMAUtil::Compress(const std::string &_rInputFileName, const std::string &
         eRet = lzma_code(&sStream, eAction);
         if (eRet != LZMA_OK && eRet != LZMA_STREAM_END)
         {
-            std::cerr << "Compression failed." << std::endl;
+            std::cerr << "Compression failed. lzma_ret=" << eRet << std::endl;
             cInputFile.close();
             cOutputFile.close();
             return false;
