@@ -14,6 +14,7 @@ public:
     static CDateTime GetNow();
 
     int GetDayOfWeek();
+    int GetMonth();
 
     CTimeSpan operator-(const CDateTime& _rOther) const;
 

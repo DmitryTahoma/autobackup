@@ -35,6 +35,11 @@ int CDateTime::GetDayOfWeek()
     return ((iYear + iYear / 4 - iYear / 100 + iYear / 400 + t[iMonth - 1] + m_iDay) + 6) % 7;
 }
 
+int CDateTime::GetMonth()
+{
+    return m_iMonth;
+}
+
 CTimeSpan CDateTime::operator-(const CDateTime &_rOther) const
 {
     CTimeSpan cTimeSpan;

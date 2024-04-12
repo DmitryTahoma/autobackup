@@ -5,7 +5,7 @@ CTimeSpan::CTimeSpan()
     m_iSeconds = 0;
 }
 
-CTimeSpan::CTimeSpan(const unsigned long long & _iSeconds)
+CTimeSpan::CTimeSpan(const long long & _iSeconds)
 {
     m_iSeconds = _iSeconds;
 }
@@ -29,7 +29,7 @@ double CTimeSpan::GetTotalDays() const
     return GetTotalHours() / 24.0;
 }
 
-void CTimeSpan::SetSeconds(const unsigned long long &_iSeconds)
+void CTimeSpan::SetSeconds(const long long &_iSeconds)
 {
     m_iSeconds = _iSeconds;
 }

@@ -3,7 +3,7 @@
 std::vector<std::string> CDirectory::GetFiles(const char *_sPath)
 {
     std::vector<std::string> cFiles;
-    
+
     DIR *pDirectory = opendir(_sPath);
     if (!pDirectory)
     {
@@ -22,4 +22,11 @@ std::vector<std::string> CDirectory::GetFiles(const char *_sPath)
 
     closedir(pDirectory);
     return cFiles;
+}
+
+void CDirectory::CreateDirectory(const char * _sPath)
+{
+    std::string sCommand = "mkdir -p ";
+    sCommand += _sPath;
+    system(sCommand.c_str());
 }
