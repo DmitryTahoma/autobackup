@@ -21,6 +21,20 @@ CDateTime CDateTime::GetNow()
     return CDateTime(std::localtime(&iCurrentTime));
 }
 
+int CDateTime::GetDayOfWeek()
+{
+    int iMonth = m_iMonth;
+    int iYear = m_iYear;
+    if (iMonth < 3)
+    {
+        iMonth += 12;
+        --iYear;
+    }
+
+    static int t[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+    return ((iYear + iYear / 4 - iYear / 100 + iYear / 400 + t[iMonth - 1] + m_iDay) + 6) % 7;
+}
+
 CTimeSpan CDateTime::operator-(const CDateTime &_rOther) const
 {
     CTimeSpan cTimeSpan;

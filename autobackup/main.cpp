@@ -7,6 +7,7 @@
 std::vector<std::string> DumpDatabases(const std::shared_ptr<CConfiguration> &_rConfiguration);
 void CompressDumps(const std::vector<std::string> &_rDumpFiles);
 void DeleteBrokenArchives(const std::shared_ptr<CConfiguration>& _rConfiguration);
+void DoRotation(const std::shared_ptr<CConfiguration>& _rConfiguration);
 
 int main(int argc, char *argv[])
 {
@@ -27,6 +28,7 @@ int main(int argc, char *argv[])
 		std::vector<std::string> cDumpFiles = DumpDatabases(pConfiguration);
 		CompressDumps(cDumpFiles);
 		DeleteBrokenArchives(pConfiguration);
+		DoRotation(pConfiguration);
 	}
 
 	return 0;
@@ -91,6 +93,40 @@ void DeleteBrokenArchives(const std::shared_ptr<CConfiguration>& _rConfiguration
 						std::cout << "Removed" << std::endl;
 					}
 				}
+			}
+		}
+	}
+}
+
+void DailyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration);
+
+void DoRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
+{
+	DailyRotation(_rConfiguration);
+	if (_rConfiguration->GetRotationDayOfWeek() == CDateTime::GetNow().GetDayOfWeek() + 1)
+	{
+		// weekly rotation
+		// monthly rotation
+	}
+}
+
+void DailyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
+{
+	for (auto& rDatabaseConfig : _rConfiguration->GetDatabases())
+	{
+		std::string sPath = rDatabaseConfig->m_sBackupDirectory + "/daily/";
+
+		std::vector<std::string> cFiles = CDirectory::GetFiles(sPath.c_str());
+		CDateTime cNow = CDateTime::GetNow();
+
+		for (auto& rFile : cFiles)
+		{
+			std::string sFilePath = sPath + rFile;
+			if ((cNow - CFile::GetModificationTime(sFilePath.c_str())).GetTotalDays() > (double)_rConfiguration->GetCountDaily())
+			{
+				std::cout << "Remove old daily: " << rFile << std::endl;
+				std::remove(sFilePath.c_str());
+				std::cout << "Removed" << std::endl;
 			}
 		}
 	}

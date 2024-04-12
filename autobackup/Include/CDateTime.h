@@ -13,6 +13,8 @@ public:
     
     static CDateTime GetNow();
 
+    int GetDayOfWeek();
+
     CTimeSpan operator-(const CDateTime& _rOther) const;
 
     std::string ToString() const;
