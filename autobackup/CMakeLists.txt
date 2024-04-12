@@ -10,6 +10,7 @@ set(HEADER_FILES
     "Include/CMySQLDumper.h"
     "Include/SDatabaseConfig.h"
     "Include/CLZMAUtil.h"
+    "Include/CDateTime.h"
     "Include/CTimeSpan.h"
 )
 
@@ -18,6 +19,7 @@ set(SOURCE_FILES
     "Source/CDumperBase.cpp"
     "Source/CMySQLDumper.cpp"
     "Source/CLZMAUtil.cpp"
+    "Source/CDateTime.cpp"
     "Source/CTimeSpan.cpp"
 )
 
