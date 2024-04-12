@@ -5,17 +5,18 @@ cmake_minimum_required (VERSION 3.8)
 
 set(HEADER_FILES
     "Include/CConfiguration.h"
-    "Include/DumperBase.h"
+    "Include/CDumperBase.h"
     "Include/EDatabaseProvider.h"
-    "Include/MySQLDumper.h"
+    "Include/CMySQLDumper.h"
     "Include/SDatabaseConfig.h"
-    "Include/MyLZMA.h"
+    "Include/CLZMAUtil.h"
 )
 
 set(SOURCE_FILES
     "Source/CConfiguration.cpp"
-    "Source/DumperBase.cpp"
-    "Source/MySQLDumper.cpp"
+    "Source/CDumperBase.cpp"
+    "Source/CMySQLDumper.cpp"
+    "Source/CLZMAUtil.cpp"
 )
 
 find_package(LibLZMA REQUIRED)

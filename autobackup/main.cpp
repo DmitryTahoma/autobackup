@@ -1,6 +1,6 @@
 ﻿#include "Include/CConfiguration.h"
-#include "Include/MySQLDumper.h"
-#include "Include/MyLZMA.h"
+#include "Include/CMySQLDumper.h"
+#include "Include/CLZMAUtil.h"
 
 int main(int argc, char* argv[])
 {
@@ -17,12 +17,12 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::vector<std::shared_ptr<DumperBase>> cDumps;
+		std::vector<std::shared_ptr<CDumperBase>> cDumps;
 		for (auto& rDatabaseConfig : cConfig.GetDatabases())
 		{
 			if (rDatabaseConfig->m_eDatabaseProvider == EDatabaseProvider::Mysql)
 			{
-				std::shared_ptr<MySQLDumper> dumper = std::make_shared<MySQLDumper>(rDatabaseConfig);
+				std::shared_ptr<CMySQLDumper> dumper = std::make_shared<CMySQLDumper>(rDatabaseConfig);
 				dumper->Dump();
 				cDumps.push_back(dumper);
 			}
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 		{
 			std::string sFileName = rDump->GetDumpFileName();
 			std::cout << "Start compressing " << sFileName << std::endl;
-			LZMA::Compress(sFileName, sFileName + ".lzma");
+			CLZMAUtil::Compress(sFileName, sFileName + ".lzma");
 			std::cout << "Compressed" << std::endl;
 			std::cout << "Removing " << sFileName << std::endl;
 			std::remove(sFileName.c_str());

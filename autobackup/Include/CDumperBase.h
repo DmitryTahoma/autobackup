@@ -1,12 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <ctime>
+
 #include "SDatabaseConfig.h"
 
-class DumperBase
+class CDumperBase
 {
 public:
-    DumperBase(const std::shared_ptr<SDatabaseConfig>& _rConfig);
+    CDumperBase(const std::shared_ptr<SDatabaseConfig>& _rConfig);
 
     virtual void Dump() = 0;
     
@@ -14,7 +16,7 @@ public:
     std::string GetDumpFileName();
 
 protected:
-    std::shared_ptr<SDatabaseConfig> pConfig;
-    std::string sDumpFileName;
+    std::shared_ptr<SDatabaseConfig> m_pConfig;
+    std::string m_sDumpFileName;
 
 };

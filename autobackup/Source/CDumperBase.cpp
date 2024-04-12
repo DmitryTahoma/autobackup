@@ -1,12 +1,11 @@
-#include <ctime>
-#include "../Include/DumperBase.h"
+#include "../Include/CDumperBase.h"
 
-DumperBase::DumperBase(const std::shared_ptr<SDatabaseConfig>& _rConfig)
+CDumperBase::CDumperBase(const std::shared_ptr<SDatabaseConfig>& _rConfig)
 {
-    pConfig = _rConfig;
+    m_pConfig = _rConfig;
 }
 
-std::string DumperBase::GetCurrentDateString()
+std::string CDumperBase::GetCurrentDateString()
 {
     std::time_t iCurrentTime = std::time(nullptr);
 	std::tm* pLocalTime = std::localtime(&iCurrentTime);
@@ -23,7 +22,7 @@ std::string DumperBase::GetCurrentDateString()
     return std::string(sBuf);
 }
 
-std::string DumperBase::GetDumpFileName()
+std::string CDumperBase::GetDumpFileName()
 {
-	return sDumpFileName;
+	return m_sDumpFileName;
 }
