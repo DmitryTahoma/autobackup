@@ -100,6 +100,7 @@ void DeleteBrokenArchives(const std::shared_ptr<CConfiguration>& _rConfiguration
 
 void DailyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration);
 void WeeklyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration);
+void MonthlyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration);
 
 void DoRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 {
@@ -107,7 +108,7 @@ void DoRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 	if (_rConfiguration->GetRotationDayOfWeek() == CDateTime::GetNow().GetDayOfWeek() + 1)
 	{
 		WeeklyRotation(_rConfiguration);
-		// monthly rotation
+		MonthlyRotation(_rConfiguration);
 	}
 }
 
@@ -133,22 +134,21 @@ void DailyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 	}
 }
 
-std::string GetNewestDaily(const std::string& _rPath)
+std::string GetNewestFile(const std::string& _rFolderPath)
 {
-	std::string sPath = _rPath + "/daily/";
-	std::vector<std::string> cFiles = CDirectory::GetFiles(sPath.c_str());
+	std::vector<std::string> cFiles = CDirectory::GetFiles(_rFolderPath.c_str());
 	int iNewestIndex = -1;
 	for (int i = 0; i < (int)cFiles.size(); ++i)
 	{
 		if (iNewestIndex == -1)
 		{
-			CDateTime cTempDate = CFile::GetModificationTime((sPath + cFiles[i]).c_str());
+			CDateTime cTempDate = CFile::GetModificationTime((_rFolderPath + cFiles[i]).c_str());
 			if (cTempDate.GetMonth() != 0)
 			{
 				iNewestIndex = i;
 			}
 		}
-		else if ((CFile::GetModificationTime((sPath + cFiles[iNewestIndex]).c_str()) - CFile::GetModificationTime((sPath + cFiles[i]).c_str())).GetTotalSeconds() < 0)
+		else if ((CFile::GetModificationTime((_rFolderPath + cFiles[iNewestIndex]).c_str()) - CFile::GetModificationTime((_rFolderPath + cFiles[i]).c_str())).GetTotalSeconds() < 0)
 		{
 			iNewestIndex = i;
 		}
@@ -161,12 +161,13 @@ void WeeklyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 {
 	for (auto& rDatabaseConfig : _rConfiguration->GetDatabases())
 	{
-		std::string sNewestDaily = GetNewestDaily(rDatabaseConfig->m_sBackupDirectory);
+		std::string sDailyDir = rDatabaseConfig->m_sBackupDirectory + "/daily/";
+		std::string sNewestDaily = GetNewestFile(sDailyDir);
 		if (!sNewestDaily.empty())
 		{
 			std::string sWeeklyDir = rDatabaseConfig->m_sBackupDirectory + "/weekly/";
 			CDirectory::CreateDirectory(sWeeklyDir.c_str());
-			std::string sSourceFile = rDatabaseConfig->m_sBackupDirectory + "/daily/" + sNewestDaily;
+			std::string sSourceFile = sDailyDir + sNewestDaily;
 			std::string sDestFile = sWeeklyDir + sNewestDaily;
 			CFile::Copy(sSourceFile.c_str(), sDestFile.c_str());
 
@@ -179,6 +180,40 @@ void WeeklyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 				if ((cNow - CFile::GetModificationTime(sFilePath.c_str())).GetTotalDays() > (double)_rConfiguration->GetCountWeekly() * 7.0)
 				{
 					std::cout << "Remove old weekly: " << rFile << std::endl;
+					std::remove(sFilePath.c_str());
+					std::cout << "Removed" << std::endl;
+				}
+			}
+		}
+	}
+}
+
+void MonthlyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
+{
+	for (auto& rDatabaseConfig : _rConfiguration->GetDatabases())
+	{
+		std::string sMonthlyDir = rDatabaseConfig->m_sBackupDirectory + "/monthly/";
+		CDirectory::CreateDirectory(sMonthlyDir.c_str());
+		std::string sNewestMonthly = GetNewestFile(sMonthlyDir);
+		CDateTime cNow = CDateTime::GetNow();
+		if (sNewestMonthly.empty() || CFile::GetModificationTime((sMonthlyDir + sNewestMonthly).c_str()).GetMonth() != cNow.GetMonth())
+		{
+			std::string sDailyDir = rDatabaseConfig->m_sBackupDirectory + "/daily/";
+			std::string sNewestDaily = GetNewestFile(sDailyDir.c_str());
+			if (!sNewestDaily.empty())
+			{
+				std::string sSourceFile = sDailyDir + sNewestDaily;
+				std::string sDestFile = sMonthlyDir + sNewestDaily;
+				CFile::Copy(sSourceFile.c_str(), sDestFile.c_str());
+			}
+
+			std::vector<std::string> cFiles = CDirectory::GetFiles(sMonthlyDir.c_str());
+			for (auto& rFile : cFiles)
+			{
+				std::string sFilePath = sMonthlyDir + rFile;
+				if ((cNow - CFile::GetModificationTime(sFilePath.c_str())).GetTotalDays() > (double)_rConfiguration->GetCountMonthly() * 28.0)
+				{
+					std::cout << "Remove old monthly: " << rFile << std::endl;
 					std::remove(sFilePath.c_str());
 					std::cout << "Removed" << std::endl;
 				}
