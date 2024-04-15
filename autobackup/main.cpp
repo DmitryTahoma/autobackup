@@ -142,13 +142,13 @@ std::string GetNewestDaily(const std::string& _rPath)
 	{
 		if (iNewestIndex == -1)
 		{
-			CDateTime cTempDate = CFile::GetModificationTime(cFiles[i].c_str());
+			CDateTime cTempDate = CFile::GetModificationTime((sPath + cFiles[i]).c_str());
 			if (cTempDate.GetMonth() != 0)
 			{
 				iNewestIndex = i;
 			}
 		}
-		else if ((CFile::GetModificationTime(cFiles[iNewestIndex].c_str()) - CFile::GetModificationTime(cFiles[i].c_str())).GetTotalSeconds() < 0)
+		else if ((CFile::GetModificationTime((sPath + cFiles[iNewestIndex]).c_str()) - CFile::GetModificationTime((sPath + cFiles[i]).c_str())).GetTotalSeconds() < 0)
 		{
 			iNewestIndex = i;
 		}
@@ -176,7 +176,7 @@ void WeeklyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 			for (auto& rFile : cFiles)
 			{
 				std::string sFilePath = sWeeklyDir + rFile;
-				if ((cNow - CFile::GetModificationTime(sFilePath.c_str())).GetTotalDays() > (double)_rConfiguration->GetCountDaily() * 7.0)
+				if ((cNow - CFile::GetModificationTime(sFilePath.c_str())).GetTotalDays() > (double)_rConfiguration->GetCountWeekly() * 7.0)
 				{
 					std::cout << "Remove old weekly: " << rFile << std::endl;
 					std::remove(sFilePath.c_str());
