@@ -8,7 +8,7 @@ CMySQLDumper::CMySQLDumper(const std::shared_ptr<SDatabaseConfig>& _rConfig)
 void CMySQLDumper::Dump()
 {
     std::string sDailyDir = m_pConfig->m_sBackupDirectory + "/daily/";
-    MakeDirectory(sDailyDir);
+    CDirectory::CreateDirectory(sDailyDir.c_str());
 
     std::stringstream ss;
     ss << sDailyDir << m_pConfig->m_sDatabaseName << "_" << GetCurrentDateString() << ".sql";
@@ -28,10 +28,4 @@ void CMySQLDumper::Dump()
         << " > " << m_sDumpFileName;
     
     system(ss.str().c_str());
-}
-
-void CMySQLDumper::MakeDirectory(const std::string& _sPath)
-{
-    std::string sCommand = "mkdir -p " + _sPath;
-    system(sCommand.c_str());
 }
