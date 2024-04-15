@@ -5,14 +5,18 @@ bool CLZMAUtil::Compress(const std::string &_rInputFileName, const std::string &
     std::ifstream cInputFile(_rInputFileName.c_str(), std::ios::binary);
     if (!cInputFile)
     {
-        std::cerr << "Failed to open file " << _rInputFileName << std::endl;
+        std::string sStr = "Failed to open file " + _rInputFileName;
+        CLog::WriteLine(sStr);
+        std::cerr << sStr << std::endl;
         return false;
     }
 
     std::ofstream cOutputFile(_rOutputFileName, std::ios::binary);
     if (!cOutputFile)
     {
-        std::cerr << "Failed to open file " << _rOutputFileName << std::endl;
+        std::string sStr = "Failed to open file " + _rOutputFileName;
+        CLog::WriteLine(sStr);
+        std::cerr << sStr << std::endl;
         cInputFile.close();
         return false;
     }
@@ -20,7 +24,9 @@ bool CLZMAUtil::Compress(const std::string &_rInputFileName, const std::string &
     lzma_stream sStream = LZMA_STREAM_INIT;
     if (lzma_easy_encoder(&sStream, LZMA_PRESET_DEFAULT | LZMA_PRESET_EXTREME, LZMA_CHECK_CRC64) != LZMA_OK)
     {
-        std::cerr << "Encoder initialization failed." << std::endl;
+        std::string sStr = "Encoder initialization failed";
+        CLog::WriteLine(sStr);
+        std::cerr << sStr << std::endl;
         cInputFile.close();
         cOutputFile.close();
         return false;
@@ -46,7 +52,9 @@ bool CLZMAUtil::Compress(const std::string &_rInputFileName, const std::string &
         eRet = lzma_code(&sStream, eAction);
         if (eRet != LZMA_OK && eRet != LZMA_STREAM_END)
         {
-            std::cerr << "Compression failed. lzma_ret=" << eRet << std::endl;
+            std::string sStr = "Compression failed. lzma_ret=" + std::to_string((int)eRet);
+            CLog::WriteLine(sStr);
+            std::cerr << sStr << std::endl;
             cInputFile.close();
             cOutputFile.close();
             return false;

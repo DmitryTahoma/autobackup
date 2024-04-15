@@ -7,7 +7,9 @@ std::vector<std::string> CDirectory::GetFiles(const char *_sPath)
     DIR *pDirectory = opendir(_sPath);
     if (!pDirectory)
     {
-        std::cerr << "Unable to open directory " << _sPath << std::endl;
+        std::string sStr = "Unable to open directory " + std::string(_sPath);
+        CLog::WriteLine(sStr);
+        std::cerr << sStr << std::endl;
         return cFiles;
     }
 

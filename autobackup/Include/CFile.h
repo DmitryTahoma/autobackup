@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "CDateTime.h"
+#include "CLog.h"
 
 class CFile
 {

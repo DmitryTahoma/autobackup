@@ -21,12 +21,14 @@ public:
 	int GetCountDaily() const;
 	int GetCountWeekly() const;
 	int GetCountMonthly() const;
+	std::string GetLogFile() const;
+	bool IsDebug() const;
 
-	bool Load(const char* _sPath);
-	const std::vector<std::shared_ptr<SDatabaseConfig>>& GetDatabases() const;
+	bool Load(const char *_sPath);
+	const std::vector<std::shared_ptr<SDatabaseConfig>> &GetDatabases() const;
 
 private:
-	bool ContainDatabaseIndex(const std::string& _rStr);
+	bool ContainDatabaseIndex(const std::string &_rStr);
 
 private:
 	std::vector<std::shared_ptr<SDatabaseConfig>> m_cDatabases;
@@ -37,4 +39,6 @@ private:
 	int m_iCountWeekly;
 	int m_iCountMonthly;
 
+	std::string m_sLogFile;
+	bool m_bDebug;
 };

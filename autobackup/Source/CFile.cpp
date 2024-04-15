@@ -6,7 +6,9 @@ CDateTime CFile::GetModificationTime(const char * _sFilePath)
 
     if (stat(_sFilePath, &fileStat) == -1)
     {
-        std::cerr << "Unable to open file " << _sFilePath << std::endl;
+        std::string sStr = "Unable to open file " + std::string(_sFilePath);
+        CLog::WriteLine(sStr);
+        std::cerr << sStr << std::endl;
         return CDateTime();
     }
     

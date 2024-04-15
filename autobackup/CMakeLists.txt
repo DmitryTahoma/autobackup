@@ -14,6 +14,7 @@ set(HEADER_FILES
     "Include/CDateTime.h"
     "Include/CTimeSpan.h"
     "Include/CFile.h"
+    "Include/CLog.h"
 )
 
 set(SOURCE_FILES
@@ -25,6 +26,7 @@ set(SOURCE_FILES
     "Source/CDateTime.cpp"
     "Source/CTimeSpan.cpp"
     "Source/CFile.cpp"
+    "Source/CLog.cpp"
 )
 
 find_package(LibLZMA REQUIRED)

@@ -7,8 +7,6 @@ CMySQLDumper::CMySQLDumper(const std::shared_ptr<SDatabaseConfig>& _rConfig)
 
 void CMySQLDumper::Dump()
 {
-    std::cout << "Start dumping " << m_pConfig->m_sDatabaseName << std::endl;
-
     std::string sDailyDir = m_pConfig->m_sBackupDirectory + "/daily/";
     MakeDirectory(sDailyDir);
 
@@ -30,8 +28,6 @@ void CMySQLDumper::Dump()
         << " > " << m_sDumpFileName;
     
     system(ss.str().c_str());
-
-    std::cout << "Success dumping " << m_pConfig->m_sDatabaseName << std::endl;
 }
 
 void CMySQLDumper::MakeDirectory(const std::string& _sPath)

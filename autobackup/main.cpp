@@ -3,6 +3,7 @@
 #include "Include/CLZMAUtil.h"
 #include "Include/CDirectory.h"
 #include "Include/CFile.h"
+#include "Include/CLog.h"
 
 std::vector<std::string> DumpDatabases(const std::shared_ptr<CConfiguration> &_rConfiguration);
 void CompressDumps(const std::vector<std::string> &_rDumpFiles);
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
+		CLog::Init(pConfiguration->GetLogFile(), pConfiguration->IsDebug());
 		std::vector<std::string> cDumpFiles = DumpDatabases(pConfiguration);
 		CompressDumps(cDumpFiles);
 		DeleteBrokenArchives(pConfiguration);
@@ -42,7 +44,9 @@ std::vector<std::string> DumpDatabases(const std::shared_ptr<CConfiguration> &_r
 		if (rDatabaseConfig->m_eDatabaseProvider == EDatabaseProvider::Mysql)
 		{
 			std::shared_ptr<CMySQLDumper> dumper = std::make_shared<CMySQLDumper>(rDatabaseConfig);
+			CLog::WriteLine("Start dumping " + rDatabaseConfig->m_sDatabaseName);
 			dumper->Dump();
+			CLog::WriteLine("End dumping " + rDatabaseConfig->m_sDatabaseName);
 			cDumpFiles.push_back(dumper->GetDumpFileName());
 		}
 	}
@@ -53,23 +57,24 @@ void CompressDumps(const std::vector<std::string> &_rDumpFiles)
 {
 	for (auto& rFileName : _rDumpFiles)
 	{
-		std::cout << "Start compressing " << rFileName << std::endl;
+    	CLog::WriteLine("Start compressing " + rFileName);
 		if (CLZMAUtil::Compress(rFileName, rFileName + ".lzma"))
 		{
-			std::cout << "Compressed" << std::endl;
-			std::cout << "Removing " << rFileName << std::endl;
+    		CLog::WriteLine("Compressed success!");
+    		CLog::WriteLine("Removing " + rFileName);
 			std::remove(rFileName.c_str());
-			std::cout << "File removed" << std::endl;
+    		CLog::WriteLine("File removed");
 		}
 		else
 		{
-			std::cerr << "Compression failed" << std::endl;
+    		CLog::WriteLine("Compression failed");
 		}
 	}
 }
 
 void DeleteBrokenArchives(const std::shared_ptr<CConfiguration>& _rConfiguration)
 {
+	CLog::WriteLine("Removing broken archives");
 	for (auto& rDatabaseConfig : _rConfiguration->GetDatabases())
 	{
 		std::string sPath = rDatabaseConfig->m_sBackupDirectory + "/daily/";
@@ -88,9 +93,9 @@ void DeleteBrokenArchives(const std::shared_ptr<CConfiguration>& _rConfiguration
 
 					if (rStr1.length() == sStr2.length() && std::equal(rStr1.begin(), rStr1.end(), sStr2.begin()))
 					{
-						std::cout << "Removing broken archive " << sStr2 << std::endl;
+						CLog::WriteLine("Removing broken archive " + sStr2);
 						std::remove((sPath + sStr2).c_str());
-						std::cout << "Removed" << std::endl;
+						CLog::WriteLine("Removed");
 					}
 				}
 			}
@@ -114,6 +119,7 @@ void DoRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 
 void DailyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 {
+	CLog::WriteLine("Daily rotation...");
 	for (auto& rDatabaseConfig : _rConfiguration->GetDatabases())
 	{
 		std::string sPath = rDatabaseConfig->m_sBackupDirectory + "/daily/";
@@ -126,9 +132,9 @@ void DailyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 			std::string sFilePath = sPath + rFile;
 			if ((cNow - CFile::GetModificationTime(sFilePath.c_str())).GetTotalDays() > (double)_rConfiguration->GetCountDaily())
 			{
-				std::cout << "Remove old daily: " << rFile << std::endl;
+				CLog::WriteLine("Removing old daily: " + rFile);
 				std::remove(sFilePath.c_str());
-				std::cout << "Removed" << std::endl;
+				CLog::WriteLine("Removed");
 			}
 		}
 	}
@@ -159,6 +165,7 @@ std::string GetNewestFile(const std::string& _rFolderPath)
 
 void WeeklyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 {
+	CLog::WriteLine("Weekly rotation...");
 	for (auto& rDatabaseConfig : _rConfiguration->GetDatabases())
 	{
 		std::string sDailyDir = rDatabaseConfig->m_sBackupDirectory + "/daily/";
@@ -179,9 +186,9 @@ void WeeklyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 				std::string sFilePath = sWeeklyDir + rFile;
 				if ((cNow - CFile::GetModificationTime(sFilePath.c_str())).GetTotalDays() > (double)_rConfiguration->GetCountWeekly() * 7.0)
 				{
-					std::cout << "Remove old weekly: " << rFile << std::endl;
+					CLog::WriteLine("Remove old weekly: " + rFile);
 					std::remove(sFilePath.c_str());
-					std::cout << "Removed" << std::endl;
+					CLog::WriteLine("Removed");
 				}
 			}
 		}
@@ -198,6 +205,7 @@ void MonthlyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 		CDateTime cNow = CDateTime::GetNow();
 		if (sNewestMonthly.empty() || CFile::GetModificationTime((sMonthlyDir + sNewestMonthly).c_str()).GetMonth() != cNow.GetMonth())
 		{
+			CLog::WriteLine("Monthly rotation...");
 			std::string sDailyDir = rDatabaseConfig->m_sBackupDirectory + "/daily/";
 			std::string sNewestDaily = GetNewestFile(sDailyDir.c_str());
 			if (!sNewestDaily.empty())
@@ -213,9 +221,9 @@ void MonthlyRotation(const std::shared_ptr<CConfiguration>& _rConfiguration)
 				std::string sFilePath = sMonthlyDir + rFile;
 				if ((cNow - CFile::GetModificationTime(sFilePath.c_str())).GetTotalDays() > (double)_rConfiguration->GetCountMonthly() * 28.0)
 				{
-					std::cout << "Remove old monthly: " << rFile << std::endl;
+					CLog::WriteLine("Remove old monthly: " + rFile);
 					std::remove(sFilePath.c_str());
-					std::cout << "Removed" << std::endl;
+					CLog::WriteLine("Removed");
 				}
 			}
 		}

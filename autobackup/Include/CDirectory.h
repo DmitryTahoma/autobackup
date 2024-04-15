@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CLog.h"
+
 #include <iostream>
 #include <vector>
 #include <string>

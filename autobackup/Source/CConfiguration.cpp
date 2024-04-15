@@ -2,9 +2,10 @@
 
 CConfiguration::CConfiguration()
 	: m_iRotationDayOfWeek(0),
-	m_iCountDaily(1),
-	m_iCountWeekly(1),
-	m_iCountMonthly(1)
+	  m_iCountDaily(1),
+	  m_iCountWeekly(1),
+	  m_iCountMonthly(1),
+	  m_bDebug(false)
 {
 }
 
@@ -28,7 +29,17 @@ int CConfiguration::GetCountMonthly() const
 	return m_iCountMonthly;
 }
 
-bool CConfiguration::Load(const char* _sPath)
+std::string CConfiguration::GetLogFile() const
+{
+	return m_sLogFile;
+}
+
+bool CConfiguration::IsDebug() const
+{
+	return m_bDebug;
+}
+
+bool CConfiguration::Load(const char *_sPath)
 {
 	std::ifstream cFile(_sPath);
 	if (!cFile.is_open())
@@ -40,46 +51,63 @@ bool CConfiguration::Load(const char* _sPath)
 	std::unordered_map<std::string, std::shared_ptr<SDatabaseConfig>> cDbMap;
 	while (std::getline(cFile, sLine))
 	{
-		if (sLine.empty() || sLine[0] == '#') continue;
+		if (sLine.empty() || sLine[0] == '#')
+			continue;
 
 		std::istringstream cIss(sLine);
 		std::string sKey, sValue;
 		std::getline(cIss, sKey, '=');
 		std::getline(cIss, sValue);
 
-		if (sKey.empty() || sValue.empty()) continue;
+		if (sKey.empty() || sValue.empty())
+			continue;
 
 		sValue.erase(std::remove(sValue.begin(), sValue.end(), '\"'), sValue.end());
 
 		if (!ContainDatabaseIndex(sKey))
 		{
-			std::istringstream cIss2(sValue);
-			int iValue;
-			if (cIss2 >> iValue)
+			if (sKey == "LOG_FILE")
 			{
-				std::transform(sKey.begin(), sKey.end(), sKey.begin(), ::toupper);
-				if (sKey == "ROTATION_DAY_OF_WEEK")
+				m_sLogFile = sValue;
+			}
+			else if (sKey == "DEBUG")
+			{
+				if (sValue == "TRUE")
 				{
-					m_iRotationDayOfWeek = iValue;
+					m_bDebug = true;
 				}
-				else if (sKey == "COUNT_DAILY")
+			}
+			else
+			{
+				std::istringstream cIss2(sValue);
+				int iValue;
+				if (cIss2 >> iValue)
 				{
-					m_iCountDaily = iValue;
-				}
-				else if (sKey == "COUNT_WEEKLY")
-				{
-					m_iCountWeekly = iValue;
-				}
-				else if (sKey == "COUNT_MONTHLY")
-				{
-					m_iCountMonthly = iValue;
+					std::transform(sKey.begin(), sKey.end(), sKey.begin(), ::toupper);
+					if (sKey == "ROTATION_DAY_OF_WEEK")
+					{
+						m_iRotationDayOfWeek = iValue;
+					}
+					else if (sKey == "COUNT_DAILY")
+					{
+						m_iCountDaily = iValue;
+					}
+					else if (sKey == "COUNT_WEEKLY")
+					{
+						m_iCountWeekly = iValue;
+					}
+					else if (sKey == "COUNT_MONTHLY")
+					{
+						m_iCountMonthly = iValue;
+					}
 				}
 			}
 		}
 		else
 		{
 			std::size_t iDbIndex = sKey.find('_');
-			if (iDbIndex == std::string::npos) continue;
+			if (iDbIndex == std::string::npos)
+				continue;
 
 			std::string sDbPrefix = sKey.substr(0, iDbIndex);
 			std::string sDbParam = sKey.substr(iDbIndex + 1);
@@ -91,7 +119,7 @@ bool CConfiguration::Load(const char* _sPath)
 			{
 				cDbMap[sDbPrefix] = std::make_shared<SDatabaseConfig>();
 			}
-			std::shared_ptr<SDatabaseConfig>& rDbInfo = cDbMap[sDbPrefix];
+			std::shared_ptr<SDatabaseConfig> &rDbInfo = cDbMap[sDbPrefix];
 
 			if (sDbParam == "USERNAME")
 			{
@@ -141,7 +169,7 @@ bool CConfiguration::Load(const char* _sPath)
 	}
 	cFile.close();
 
-	for (const auto& rPair : cDbMap)
+	for (const auto &rPair : cDbMap)
 	{
 		m_cDatabases.push_back(rPair.second);
 	}
@@ -149,12 +177,12 @@ bool CConfiguration::Load(const char* _sPath)
 	return true;
 }
 
-const std::vector<std::shared_ptr<SDatabaseConfig>>& CConfiguration::GetDatabases() const
+const std::vector<std::shared_ptr<SDatabaseConfig>> &CConfiguration::GetDatabases() const
 {
 	return m_cDatabases;
 }
 
-bool CConfiguration::ContainDatabaseIndex(const std::string& _rStr)
+bool CConfiguration::ContainDatabaseIndex(const std::string &_rStr)
 {
 	std::regex cPattern("^DB\\d+");
 	return std::regex_search(_rStr, cPattern);

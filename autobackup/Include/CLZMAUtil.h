@@ -5,6 +5,8 @@
 #include <string>
 #include <lzma.h>
 
+#include "Clog.h"
+
 class CLZMAUtil
 {
 public:
